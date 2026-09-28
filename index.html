@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>سجل منسق الموهوبين - الإدارة المتكاملة</title>
     <!-- مكتبة الأيقونات والخطوط -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +14,7 @@
 
     <style>
         /* =========================================================
-           1. تصميم لوحة التحكم الأساسية (Dashboard)
+           1. الأساسيات والمتغيرات
            ========================================================= */
         :root {
             --primary-color: #0b5e65;
@@ -24,12 +24,25 @@
             --sidebar-width: 280px;
             --gold: #d4af37;
         }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+
+        /* =========================================================
+           2. تخطيط لوحة التحكم (Dashboard Layout)
+           ========================================================= */
+        .app-container { display: flex; min-height: 100vh; transition: 0.3s; position: relative; }
         
-        .app-container { display: flex; min-height: 100vh; transition: 0.3s; }
+        /* الشريط الجانبي */
+        .sidebar { 
+            width: var(--sidebar-width); background-color: var(--primary-color); color: white; 
+            height: 100vh; position: fixed; overflow-y: auto; box-shadow: 2px 0 10px rgba(0,0,0,0.2); 
+            z-index: 100; transition: transform 0.3s ease; 
+        }
+        /* زر إغلاق القائمة للجوال */
+        .mobile-close-btn { display: none; position: absolute; top: 10px; left: 10px; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
         
-        .sidebar { width: var(--sidebar-width); background-color: var(--primary-color); color: white; height: 100vh; position: fixed; overflow-y: auto; box-shadow: 2px 0 10px rgba(0,0,0,0.2); z-index: 100; }
-        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; }
         .sidebar-header i { font-size: 2.5em; color: var(--gold); margin-bottom: 10px; }
         .sidebar-header h3 { margin: 5px 0 0 0; font-size: 1.2em; font-family: 'Amiri', serif;}
         .sidebar-header p { margin: 5px 0; font-size: 0.9em; color: #d1e8e2; }
@@ -40,54 +53,71 @@
         .nav-links li:hover, .nav-links li.active { background-color: var(--secondary-color); border-right: 4px solid var(--gold); }
         .nav-links li.active i { color: var(--gold); }
 
-        .main-content { margin-right: var(--sidebar-width); padding: 30px; width: calc(100% - var(--sidebar-width)); box-sizing: border-box; }
+        /* المحتوى الرئيسي */
+        .main-content { margin-right: var(--sidebar-width); padding: 20px; width: calc(100% - var(--sidebar-width)); transition: 0.3s; }
         
-        .header-banner { background: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-top: 4px solid var(--primary-color); }
-        .user-profile { display: flex; align-items: center; gap: 10px; background: #eef7f6; padding: 8px 15px; border-radius: 20px; color: var(--primary-color); font-weight: bold; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; border-right: 4px solid var(--secondary-color); }
-        .stat-card i { font-size: 2.5em; color: var(--primary-color); opacity: 0.8; }
-        .stat-info h4 { margin: 0; font-size: 0.9em; color: #666; }
-        .stat-info h2 { margin: 5px 0 0 0; font-size: 1.8em; color: var(--primary-color); }
+        /* زر فتح القائمة للجوال (Hamburger) */
+        .mobile-toggle-btn { display: none; background: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; margin-bottom: 15px; }
 
-        .section { display: none; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); animation: fadeIn 0.4s; margin-bottom: 20px;}
+        .header-banner { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 4px solid var(--primary-color); flex-wrap: wrap; gap: 15px; }
+        .header-banner h1 { margin:0; color: var(--primary-color); font-size: 1.3em; font-family: 'Amiri', serif; }
+        .user-profile { display: flex; align-items: center; gap: 10px; background: #eef7f6; padding: 8px 15px; border-radius: 20px; color: var(--primary-color); font-weight: bold; font-size: 0.9em; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; border-right: 4px solid var(--secondary-color); }
+        .stat-card i { font-size: 2em; color: var(--primary-color); opacity: 0.8; }
+        .stat-info h4 { margin: 0; font-size: 0.8em; color: #666; }
+        .stat-info h2 { margin: 5px 0 0 0; font-size: 1.5em; color: var(--primary-color); }
+
+        .section { display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); animation: fadeIn 0.4s; margin-bottom: 20px;}
         .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        h2.section-title { color: var(--primary-color); border-bottom: 2px solid #eef7f6; padding-bottom: 10px; margin-top: 0; display: flex; align-items: center; gap: 10px; font-family: 'Amiri', serif;}
+        h2.section-title { color: var(--primary-color); border-bottom: 2px solid #eef7f6; padding-bottom: 10px; margin-top: 0; display: flex; align-items: center; gap: 10px; font-family: 'Amiri', serif; font-size: 1.2em; flex-wrap: wrap; }
         
-        table.dash-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        table.dash-table, table.dash-table th, table.dash-table td { border: 1px solid #eef7f6; }
-        table.dash-table th, table.dash-table td { padding: 12px 15px; text-align: right; }
-        table.dash-table th { background-color: var(--primary-color); color: white; font-weight: normal; }
+        /* الجداول والنماذج المتجاوبة */
+        .table-responsive { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
+        table.dash-table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 600px; }
+        table.dash-table th, table.dash-table td { border: 1px solid #eef7f6; padding: 10px; text-align: right; font-size: 0.9em; }
+        table.dash-table th { background-color: var(--primary-color); color: white; font-weight: normal; white-space: nowrap; }
         table.dash-table tr:nth-child(even) { background-color: #fcfcfc; }
-        table.dash-table tr:hover { background-color: #f0f9f8; }
         
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; background: #fcfcfc; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 15px; background: #fcfcfc; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
+        @media (min-width: 768px) { .form-grid { grid-template-columns: 1fr 1fr; } }
         .form-group.full-width { grid-column: 1 / -1; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; font-size: 0.9em;}
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-family: inherit; transition: border 0.3s; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 0.85em;}
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.9em; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--secondary-color); outline: none; }
         
-        .btn { padding: 10px 20px; font-size: 1em; border-radius: 6px; cursor: pointer; font-weight: bold; border: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; font-family: 'Cairo', sans-serif;}
+        /* الأزرار */
+        .btn { padding: 8px 15px; font-size: 0.9em; border-radius: 6px; cursor: pointer; font-weight: bold; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Cairo', sans-serif; transition: 0.2s;}
         .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-primary:hover { background-color: #08484d; }
         .btn-accent { background-color: var(--gold); color: white; }
-        .btn-accent:hover { background-color: #b5952f; }
         .btn-outline { background-color: white; border: 1px solid var(--primary-color); color: var(--primary-color); }
-        .btn-outline:hover { background-color: #eef7f6; }
         .btn-danger { background-color: #e74c3c; color: white; }
-        .btn-danger:hover { background-color: #c0392b; }
-        .btn-sm { padding: 6px 10px; font-size: 0.85em; margin-right: 5px; }
+        .btn-sm { padding: 5px 8px; font-size: 0.8em; }
 
-        .action-buttons { display: flex; gap: 5px; justify-content: flex-start; }
+        .action-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
         .ml-auto { margin-right: auto; }
-        .special-btn { background: linear-gradient(45deg, #d4af37, #f9a826); color: #fff; border: none; font-size: 1.1em; padding: 15px; margin: 10px 20px; border-radius: 8px; text-align: center; justify-content: center; display: flex; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); }
-        .special-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6); color: white; }
+        
+        .special-btn { background: linear-gradient(45deg, #d4af37, #f9a826); color: #fff; border: none; font-size: 1em; padding: 12px; margin: 10px 20px; border-radius: 8px; text-align: center; justify-content: center; display: flex; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.4); }
 
         /* =========================================================
-           2. تصميم عرض الكتاب التفاعلي (3D Flipbook)
+           3. استجابة لوحة التحكم للجوال (Mobile Media Queries)
+           ========================================================= */
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(100%); width: 250px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-right: 0; width: 100%; }
+            .mobile-toggle-btn { display: inline-flex; align-items: center; gap: 8px; }
+            .mobile-close-btn { display: block; }
+            /* طبقة تظليل خلف القائمة */
+            .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
+            .overlay.active { display: block; }
+        }
+
+        /* =========================================================
+           4. تصميم الكتاب التفاعلي (Flipbook - Desktop vs Mobile)
            ========================================================= */
         #flipbook-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -95,91 +125,108 @@
             z-index: 1000; justify-content: center; align-items: center; overflow: hidden;
         }
         
-        .btn-close-fb { position: absolute; top: 20px; right: 20px; z-index: 2000; font-size: 1.2em; padding: 10px 20px; background: var(--primary-color); color: white; border-radius: 30px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .btn-close-fb:hover { background: #08484d; }
+        .btn-close-fb { position: absolute; top: 15px; right: 15px; z-index: 2000; font-size: 1em; padding: 8px 15px; background: var(--primary-color); color: white; border-radius: 20px; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        .book-wrapper {
-            perspective: 3000px;
-            width: min(90vw, 1200px);
-            height: min(85vh, 800px);
-            position: relative;
-            box-shadow: 0 30px 50px rgba(0,0,0,0.2);
-            border-radius: 5px;
-        }
+        /* حاوية محتوى الصفحات مشتركة */
+        .fb-content { padding: 8%; height: 100%; box-sizing: border-box; overflow-y: auto; position: relative; }
+        .fb-content::-webkit-scrollbar { width: 4px; }
+        .fb-content::-webkit-scrollbar-thumb { background-color: rgba(11, 94, 101, 0.3); border-radius: 10px; }
 
-        .leaf {
-            position: absolute; top: 0; left: 0; width: 50%; height: 100%;
-            transform-style: preserve-3d; transform-origin: right center;
-            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
-            cursor: pointer; z-index: calc(10 - var(--i));
-        }
-        .leaf.flipped { transform: rotateY(180deg); z-index: var(--i); }
-
-        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-color: #fdfbf7; overflow: hidden; display: flex; flex-direction: column; }
-        .face.front { transform: rotateY(0deg); border-right: 1px solid rgba(0,0,0,0.05); border-radius: 5px 0 0 5px; box-shadow: inset -15px 0 20px -10px rgba(0,0,0,0.05); }
-        .face.back { transform: rotateY(180deg); border-left: 1px solid rgba(0,0,0,0.05); border-radius: 0 5px 5px 0; box-shadow: inset 15px 0 20px -10px rgba(0,0,0,0.05); }
-
-        .fb-content { padding: 6%; height: 100%; box-sizing: border-box; overflow-y: auto; position: relative; }
-        .fb-content::-webkit-scrollbar { width: 5px; }
-        .fb-content::-webkit-scrollbar-thumb { background-color: rgba(11, 94, 101, 0.2); border-radius: 10px; }
-
-        .cover-front { background: linear-gradient(135deg, var(--primary-color), #06383c); color: white; text-align: center; border: 8px solid var(--gold); outline: 2px solid var(--primary-color); outline-offset: -10px; }
-        .cover-front::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 40px; background: linear-gradient(to left, rgba(255,255,255,0.15), transparent); }
-        .cover-title { font-family: 'Amiri', serif; font-size: clamp(2.5em, 5vw, 4em); margin: 15px 0; color: var(--gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.4); }
+        .cover-front { background: linear-gradient(135deg, var(--primary-color), #06383c); color: white; text-align: center; border: 4px solid var(--gold); outline: 1px solid var(--primary-color); outline-offset: -6px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .cover-title { font-family: 'Amiri', serif; font-size: clamp(2em, 8vw, 3.5em); margin: 10px 0; color: var(--gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.4); }
+        .fb-page-title { color: var(--primary-color); font-family: 'Amiri', serif; font-size: clamp(1.2em, 5vw, 1.8em); border-bottom: 2px solid var(--gold); padding-bottom: 5px; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .page-number { position: absolute; bottom: 10px; font-size: 1em; color: #aaa; font-family: 'Amiri', serif; }
         
-        .fb-page-title { color: var(--primary-color); font-family: 'Amiri', serif; font-size: clamp(1.5em, 2.5vw, 2em); border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-top: 0; display: flex; align-items: center; gap: 15px; }
-        .page-number { position: absolute; bottom: 15px; font-size: 1.1em; color: #aaa; font-family: 'Amiri', serif; }
-        .face.front .page-number { right: 30px; }
-        .face.back .page-number { left: 30px; }
-
-        table.fb-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 0.9em; }
-        table.fb-table th, table.fb-table td { padding: 10px; text-align: right; border-bottom: 1px solid #eee; }
+        .fb-table-wrap { overflow-x: auto; width: 100%; }
+        table.fb-table { width: 100%; border-collapse: collapse; background: white; font-size: 0.85em; min-width: 400px; }
+        table.fb-table th, table.fb-table td { padding: 8px; text-align: right; border-bottom: 1px solid #eee; }
         table.fb-table th { background-color: var(--primary-color); color: white; }
-        table.fb-table tr:nth-child(even) { background-color: #fafafa; }
-        
-        .hint-flip { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); color: var(--primary-color); font-size: 1.1em; font-weight: bold; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); pointer-events: none; }
 
-        @media print { .sidebar, .header-banner, .btn, .special-btn, .action-buttons { display: none !important; } .main-content { margin: 0; width: 100%; padding: 0; } .section { box-shadow: none; border: none; } }
+        /* 4.A وضع الكمبيوتر (3D Flipbook) */
+        @media (min-width: 993px) {
+            .mobile-book-container { display: none !important; }
+            .desktop-book-wrapper {
+                perspective: 3000px; width: min(90vw, 1100px); height: min(85vh, 700px);
+                position: relative; box-shadow: 0 30px 50px rgba(0,0,0,0.2); border-radius: 5px; display: block;
+            }
+            .leaf {
+                position: absolute; top: 0; left: 0; width: 50%; height: 100%;
+                transform-style: preserve-3d; transform-origin: right center;
+                transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+                cursor: pointer; z-index: calc(10 - var(--i));
+            }
+            .leaf.flipped { transform: rotateY(180deg); z-index: var(--i); }
+            .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-color: #fdfbf7; overflow: hidden; }
+            .face.front { transform: rotateY(0deg); border-right: 1px solid rgba(0,0,0,0.05); border-radius: 5px 0 0 5px; box-shadow: inset -15px 0 20px -10px rgba(0,0,0,0.05); }
+            .face.back { transform: rotateY(180deg); border-left: 1px solid rgba(0,0,0,0.05); border-radius: 0 5px 5px 0; box-shadow: inset 15px 0 20px -10px rgba(0,0,0,0.05); }
+            .face.front .page-number { right: 20px; }
+            .face.back .page-number { left: 20px; }
+            .hint-flip { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); color: var(--primary-color); font-weight: bold; background: rgba(255,255,255,0.9); padding: 5px 15px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); pointer-events: none; }
+        }
+
+        /* 4.B وضع الجوال (Swipe Cards) */
+        @media (max-width: 992px) {
+            .desktop-book-wrapper { display: none !important; }
+            .hint-flip { display: none; }
+            
+            .mobile-book-container {
+                display: flex; flex-direction: column; width: 100%; height: 100%;
+                padding: 60px 15px 20px; overflow-y: auto; gap: 20px; scroll-behavior: smooth;
+            }
+            
+            .mobile-page {
+                background: #fdfbf7; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                min-height: 80vh; position: relative; overflow: hidden; display: flex; flex-direction: column;
+            }
+            
+            .mobile-page .page-number { left: 50%; transform: translateX(-50%); bottom: 10px; }
+        }
     </style>
 </head>
 <body>
+
+    <!-- طبقة التظليل للجوال -->
+    <div class="overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
 
     <!-- ================== واجهة التطبيق (لوحة التحكم) ================== -->
     <div class="app-container" id="main-app">
         
         <!-- الشريط الجانبي -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
+            <button class="mobile-close-btn" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
             <div class="sidebar-header">
                 <i class="fas fa-lightbulb"></i>
-                <h3>سجل منسق الموهوبين</h3>
+                <h3>سجل الموهوبين</h3>
                 <p>إدارة السجل والتنظيم</p>
             </div>
             
-            <!-- زر تشغيل العرض التفاعلي -->
-            <button class="btn special-btn" onclick="openFlipbook()"><i class="fas fa-book-open"></i> استعراض السجل ككتاب</button>
+            <button class="btn special-btn" onclick="openFlipbook()"><i class="fas fa-book-open"></i> عرض السجل (كتاب)</button>
 
             <ul class="nav-links">
                 <li class="active" onclick="showSection('dashboard')"><i class="fas fa-chart-pie"></i> لوحة المعلومات</li>
                 <li onclick="showSection('intro')"><i class="fas fa-id-card"></i> البيانات الأولية</li>
                 <li onclick="showSection('ksa-care')"><i class="fas fa-seedling"></i> رعاية الموهوبين</li>
-                <li onclick="showSection('plan')"><i class="fas fa-tasks"></i> الخطة الإجرائية الكاملة</li>
+                <li onclick="showSection('plan')"><i class="fas fa-tasks"></i> الخطة الإجرائية</li>
                 <li onclick="showSection('students')"><i class="fas fa-user-graduate"></i> الطلاب الموهوبين</li>
                 <li onclick="showSection('competitions')"><i class="fas fa-trophy"></i> المسابقات المنفذة</li>
-                <li onclick="showSection('training')"><i class="fas fa-chalkboard-teacher"></i> دورات التدريب والأنشطة</li>
+                <li onclick="showSection('training')"><i class="fas fa-chalkboard-teacher"></i> التدريب والأنشطة</li>
                 <li onclick="showSection('enrichment')"><i class="fas fa-puzzle-piece"></i> البرامج الإثرائية</li>
                 <li onclick="showSection('achievements')"><i class="fas fa-medal"></i> الإنجازات</li>
-                <li onclick="showSection('events')"><i class="fas fa-flag"></i> المناسبات والفعاليات</li>
-                <li onclick="showSection('reports')"><i class="fas fa-file-signature"></i> أرشيف التقارير</li>
-                <li onclick="showSection('circulars')"><i class="fas fa-envelope-open-text"></i> التعاميم الواردة</li>
+                <li onclick="showSection('events')"><i class="fas fa-flag"></i> الفعاليات</li>
+                <li onclick="showSection('reports')"><i class="fas fa-file-signature"></i> التقارير</li>
+                <li onclick="showSection('circulars')"><i class="fas fa-envelope-open-text"></i> التعاميم</li>
             </ul>
         </div>
 
         <!-- المحتوى الرئيسي -->
         <div class="main-content">
+            
+            <button class="mobile-toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i> القائمة</button>
+
             <div class="header-banner">
                 <div>
-                    <h1 style="margin:0; color: var(--primary-color); font-size: 1.5em; font-family: 'Amiri', serif;">الإدارة العامة للتعليم بمنطقة القصيم</h1>
-                    <p style="margin:5px 0 0 0; color: #666;">العام الدراسي ١٤٤٧ هـ</p>
+                    <h1>إدارة التعليم بمنطقة القصيم</h1>
+                    <p style="margin:5px 0 0 0; color: #666; font-size: 0.85em;">العام الدراسي ١٤٤٧ هـ</p>
                 </div>
                 <div class="user-profile">
                     <i class="fas fa-user-tie"></i> أ. <span id="top-coordinator-name">عاصم المشيقح</span>
@@ -188,145 +235,135 @@
 
             <!-- 0. Dashboard -->
             <div id="dashboard" class="section active">
-                <h2 class="section-title"><i class="fas fa-chart-pie"></i> ملخص الإنجازات والإحصائيات</h2>
+                <h2 class="section-title"><i class="fas fa-chart-pie"></i> ملخص الإحصائيات</h2>
                 <div class="stats-grid">
-                    <div class="stat-card"><i class="fas fa-user-graduate"></i><div class="stat-info"><h4>الطلاب الموهوبين</h4><h2 id="stat-students">0</h2></div></div>
-                    <div class="stat-card"><i class="fas fa-trophy"></i><div class="stat-info"><h4>المسابقات المنفذة</h4><h2 id="stat-competitions">0</h2></div></div>
-                    <div class="stat-card"><i class="fas fa-medal"></i><div class="stat-info"><h4>الإنجازات المسجلة</h4><h2 id="stat-achievements">0</h2></div></div>
-                    <div class="stat-card"><i class="fas fa-chalkboard-teacher"></i><div class="stat-info"><h4>الدورات والأنشطة</h4><h2 id="stat-training">0</h2></div></div>
+                    <div class="stat-card"><i class="fas fa-user-graduate"></i><div class="stat-info"><h4>الموهوبين</h4><h2 id="stat-students">0</h2></div></div>
+                    <div class="stat-card"><i class="fas fa-trophy"></i><div class="stat-info"><h4>المسابقات</h4><h2 id="stat-competitions">0</h2></div></div>
+                    <div class="stat-card"><i class="fas fa-medal"></i><div class="stat-info"><h4>الإنجازات</h4><h2 id="stat-achievements">0</h2></div></div>
+                    <div class="stat-card"><i class="fas fa-chalkboard-teacher"></i><div class="stat-info"><h4>الأنشطة</h4><h2 id="stat-training">0</h2></div></div>
                 </div>
             </div>
 
             <!-- 1. Intro -->
             <div id="intro" class="section">
-                <h2 class="section-title"><i class="fas fa-id-card"></i> البيانات الأولية للمدرسة والمنسق <button class="btn btn-outline btn-sm ml-auto" id="btn-toggle-intro" onclick="toggleIntroEdit()"><i class="fas fa-edit"></i> تعديل</button></h2>
-                <table class="dash-table" id="intro-display-table">
-                    <tr><th>اسم المدرسة</th><td id="disp-school-name"></td><th>الرقم الوزاري</th><td id="disp-school-id"></td></tr>
-                    <tr><th>مكتب التعليم</th><td id="disp-office"></td><th>المرحلة الدراسية</th><td id="disp-stage"></td></tr>
-                    <tr><th>مدير المدرسة</th><td id="disp-principal"></td><th>منسق الموهوبين</th><td id="disp-coordinator"></td></tr>
-                </table>
+                <h2 class="section-title"><i class="fas fa-id-card"></i> البيانات الأولية <button class="btn btn-outline btn-sm ml-auto" id="btn-toggle-intro" onclick="toggleIntroEdit()"><i class="fas fa-edit"></i> تعديل</button></h2>
+                <div class="table-responsive">
+                    <table class="dash-table" id="intro-display-table">
+                        <tr><th>المدرسة</th><td id="disp-school-name"></td><th>الرقم الوزاري</th><td id="disp-school-id"></td></tr>
+                        <tr><th>مكتب التعليم</th><td id="disp-office"></td><th>المرحلة</th><td id="disp-stage"></td></tr>
+                        <tr><th>المدير</th><td id="disp-principal"></td><th>المنسق</th><td id="disp-coordinator"></td></tr>
+                    </table>
+                </div>
                 <div id="intro-edit-form" class="form-grid" style="display: none;">
                     <div class="form-group"><label>اسم المدرسة:</label><input type="text" id="edit-school-name"></div>
                     <div class="form-group"><label>الرقم الوزاري:</label><input type="text" id="edit-school-id"></div>
                     <div class="form-group"><label>مكتب التعليم:</label><input type="text" id="edit-office"></div>
                     <div class="form-group"><label>المرحلة الدراسية:</label><input type="text" id="edit-stage"></div>
                     <div class="form-group"><label>مدير المدرسة:</label><input type="text" id="edit-principal"></div>
-                    <div class="form-group"><label>منسق الموهوبين:</label><input type="text" id="edit-coordinator"></div>
+                    <div class="form-group"><label>المنسق:</label><input type="text" id="edit-coordinator"></div>
                     <div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveIntro()">حفظ</button><button class="btn btn-outline" onclick="toggleIntroEdit()">إلغاء</button></div>
                 </div>
             </div>
 
             <!-- 2. KSA Care -->
             <div id="ksa-care" class="section">
-                <h2 class="section-title"><i class="fas fa-seedling"></i> رعاية الموهوبين في المملكة <button class="btn btn-outline btn-sm ml-auto" id="btn-toggle-ksacare" onclick="toggleKsaCareEdit()"><i class="fas fa-edit"></i> تعديل</button></h2>
+                <h2 class="section-title"><i class="fas fa-seedling"></i> رعاية الموهوبين <button class="btn btn-outline btn-sm ml-auto" id="btn-toggle-ksacare" onclick="toggleKsaCareEdit()"><i class="fas fa-edit"></i> تعديل</button></h2>
                 <div id="ksacare-display">
-                    <p id="disp-ksacare-desc" style="line-height: 1.8;"></p>
-                    <h3>أدوار ومهام منسق الموهوبين:</h3>
-                    <ul id="disp-ksacare-roles" style="line-height: 1.8;"></ul>
+                    <p id="disp-ksacare-desc" style="line-height: 1.8; font-size: 0.95em;"></p>
+                    <h3 style="font-size: 1em;">أدوار المنسق:</h3>
+                    <ul id="disp-ksacare-roles" style="line-height: 1.8; font-size: 0.9em; padding-right: 20px;"></ul>
                 </div>
                 <div id="ksacare-edit-form" class="form-grid" style="display: none;">
                     <div class="form-group full-width"><label>الهدف من السجل:</label><textarea id="edit-ksacare-desc" rows="4"></textarea></div>
-                    <div class="form-group full-width"><label>أدوار المنسق (كل مهمة بسطر):</label><textarea id="edit-ksacare-roles" rows="5"></textarea></div>
+                    <div class="form-group full-width"><label>الأدوار (كل مهمة بسطر):</label><textarea id="edit-ksacare-roles" rows="5"></textarea></div>
                     <div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveKsaCare()">حفظ</button><button class="btn btn-outline" onclick="toggleKsaCareEdit()">إلغاء</button></div>
                 </div>
             </div>
 
-            <!-- 3. Plan (المحدثة) -->
+            <!-- 3. Plan -->
             <div id="plan" class="section">
-                <h2 class="section-title"><i class="fas fa-tasks"></i> الخطة الإجرائية للبرامج والمبادرات (منسق الموهوبين)</h2>
+                <h2 class="section-title"><i class="fas fa-tasks"></i> الخطة الإجرائية للبرامج والمبادرات</h2>
                 <div class="form-grid">
                     <input type="hidden" id="plan-id">
                     <div class="form-group full-width"><label>اسم البرنامج / المبادرة:</label><input type="text" id="plan-program" placeholder="مثال: مسابقة الباحث الصغير"></div>
-                    <div class="form-group full-width"><label>المهام والإجراءات (كل مهمة بسطر جديد):</label><textarea id="plan-actions" rows="4" placeholder="مثال: الاطلاع على التعميم..."></textarea></div>
-                    <div class="form-group"><label>المستهدفون / المراحل المستهدفة:</label><input type="text" id="plan-targets" placeholder="مثال: طلبة المرحلة الابتدائية"></div>
+                    <div class="form-group full-width"><label>المهام والإجراءات (كل مهمة بسطر):</label><textarea id="plan-actions" rows="4" placeholder="مثال: الاطلاع على التعميم..."></textarea></div>
+                    <div class="form-group"><label>المستهدفون / المراحل:</label><input type="text" id="plan-targets" placeholder="مثال: طلبة المرحلة الابتدائية"></div>
                     <div class="form-group"><label>حالة التنفيذ:</label><select id="plan-status"><option>منفذ</option><option>قيد التنفيذ</option><option>لم ينفذ</option></select></div>
                     <div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('plan')">حفظ البرنامج</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-plan" onclick="resetForm('plan')">إلغاء</button></div>
                 </div>
-                <table class="dash-table" id="table-plan"><thead><tr><th style="width:20%;">البرنامج</th><th style="width:45%;">المهام والإجراءات</th><th style="width:15%;">المستهدفون</th><th style="width:10%;">الحالة</th><th style="width:10%;">الإجراءات</th></tr></thead><tbody></tbody></table>
+                <div class="table-responsive">
+                    <table class="dash-table" id="table-plan"><thead><tr><th style="width:20%;">البرنامج</th><th style="width:40%;">الإجراءات</th><th style="width:15%;">المستهدفون</th><th style="width:10%;">الحالة</th><th style="width:15%;">أوامر</th></tr></thead><tbody></tbody></table>
+                </div>
             </div>
 
-            <!-- 4. Students (الطلاب الموهوبين) -->
+            <!-- 4. Students -->
             <div id="students" class="section">
-                <h2 class="section-title"><i class="fas fa-user-graduate"></i> قاعدة بيانات الطلاب الموهوبين</h2>
+                <h2 class="section-title"><i class="fas fa-user-graduate"></i> بيانات الطلاب الموهوبين</h2>
                 <div class="form-grid">
                     <input type="hidden" id="students-id">
-                    <div class="form-group"><label>اسم الطالب الرباعي:</label><input type="text" id="students-name"></div>
-                    <div class="form-group"><label>الصف الدراسي:</label>
-                        <select id="students-grade"><option>الرابع الابتدائي</option><option>الخامس الابتدائي</option><option>السادس الابتدائي</option></select>
-                    </div>
-                    <div class="form-group full-width"><label>موهبة الطالب / تميزه:</label><input type="text" id="students-talent" placeholder="مثال: ذكاء منطقي، حفظ متقن، ابتكار علمي..."></div>
+                    <div class="form-group"><label>اسم الطالب:</label><input type="text" id="students-name"></div>
+                    <div class="form-group"><label>الصف:</label><select id="students-grade"><option>الرابع الابتدائي</option><option>الخامس الابتدائي</option><option>السادس الابتدائي</option></select></div>
+                    <div class="form-group full-width"><label>الموهبة:</label><input type="text" id="students-talent" placeholder="مثال: ذكاء منطقي، حفظ متقن..."></div>
                     <div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('students')">إضافة طالب</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-students" onclick="resetForm('students')">إلغاء</button></div>
                 </div>
-                <table class="dash-table" id="table-students"><thead><tr><th>اسم الطالب</th><th>الصف</th><th>الموهبة</th><th>الإجراءات</th></tr></thead><tbody></tbody></table>
+                <div class="table-responsive"><table class="dash-table" id="table-students"><thead><tr><th>الطالب</th><th>الصف</th><th>الموهبة</th><th>أوامر</th></tr></thead><tbody></tbody></table></div>
             </div>
 
-            <!-- 5. Competitions (المسابقات المنفذة) -->
+            <!-- 5. Competitions -->
             <div id="competitions" class="section">
-                <h2 class="section-title"><i class="fas fa-trophy"></i> المسابقات المنفذة ومشاركات الطلاب</h2>
+                <h2 class="section-title"><i class="fas fa-trophy"></i> المسابقات المنفذة</h2>
                 <div class="form-grid">
                     <input type="hidden" id="competitions-id">
-                    <div class="form-group"><label>اسم المسابقة المنفذة:</label><input type="text" id="competitions-compName" placeholder="مثال: إبداع، بيبراس، الباحث الصغير..."></div>
-                    <div class="form-group"><label>اسم الطالب الرباعي:</label><input type="text" id="competitions-studentName"></div>
-                    <div class="form-group"><label>الصف الدراسي:</label>
-                        <select id="competitions-grade"><option>الرابع الابتدائي</option><option>الخامس الابتدائي</option><option>السادس الابتدائي</option></select>
-                    </div>
-                    <div class="form-group"><label>مجال المشاركة:</label><input type="text" id="competitions-field" placeholder="مثال: ابتكار، برمجة، علوم..."></div>
-                    <div class="form-group full-width action-buttons"><button class="btn btn-accent" onclick="saveDataRow('competitions')">تسجيل المشاركة</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-competitions" onclick="resetForm('competitions')">إلغاء</button></div>
+                    <div class="form-group"><label>المسابقة:</label><input type="text" id="competitions-compName"></div>
+                    <div class="form-group"><label>اسم الطالب:</label><input type="text" id="competitions-studentName"></div>
+                    <div class="form-group"><label>الصف:</label><select id="competitions-grade"><option>الرابع الابتدائي</option><option>الخامس الابتدائي</option><option>السادس الابتدائي</option></select></div>
+                    <div class="form-group"><label>المجال:</label><input type="text" id="competitions-field"></div>
+                    <div class="form-group full-width action-buttons"><button class="btn btn-accent" onclick="saveDataRow('competitions')">تسجيل مشاركة</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-competitions" onclick="resetForm('competitions')">إلغاء</button></div>
                 </div>
-                <table class="dash-table" id="table-competitions"><thead><tr><th>المسابقة المنفذة</th><th>الطالب المشارك</th><th>الصف</th><th>مجال المشاركة</th><th>الإجراءات</th></tr></thead><tbody></tbody></table>
+                <div class="table-responsive"><table class="dash-table" id="table-competitions"><thead><tr><th>المسابقة</th><th>الطالب</th><th>الصف</th><th>المجال</th><th>أوامر</th></tr></thead><tbody></tbody></table></div>
             </div>
 
-            <!-- 6. Training & Activities (دورات التدريب والأنشطة) -->
+            <!-- 6. Training & Activities -->
             <div id="training" class="section">
-                <h2 class="section-title"><i class="fas fa-chalkboard-teacher"></i> دورات التدريب والأنشطة المنفذة</h2>
-                <div class="form-grid">
-                    <input type="hidden" id="training-id">
-                    <div class="form-group"><label>اسم الدورة / النشاط المنفذ:</label><input type="text" id="training-name"></div>
-                    <div class="form-group"><label>الفئة المستهدفة:</label><input type="text" id="training-target"></div>
-                    <div class="form-group"><label>تاريخ التنفيذ:</label><input type="date" id="training-date"></div>
-                    <div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('training')">إضافة النشاط</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-training" onclick="resetForm('training')">إلغاء</button></div>
-                </div>
-                <table class="dash-table" id="table-training"><thead><tr><th>الدورة / النشاط</th><th>المستهدفون</th><th>التاريخ</th><th>الإجراءات</th></tr></thead><tbody></tbody></table>
+                <h2 class="section-title"><i class="fas fa-chalkboard-teacher"></i> التدريب والأنشطة</h2>
+                <div class="form-grid"><input type="hidden" id="training-id"><div class="form-group"><label>النشاط:</label><input type="text" id="training-name"></div><div class="form-group"><label>المستهدفون:</label><input type="text" id="training-target"></div><div class="form-group"><label>التاريخ:</label><input type="date" id="training-date"></div><div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('training')">إضافة النشاط</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-training" onclick="resetForm('training')">إلغاء</button></div></div>
+                <div class="table-responsive"><table class="dash-table" id="table-training"><thead><tr><th>النشاط</th><th>المستهدفون</th><th>التاريخ</th><th>أوامر</th></tr></thead><tbody></tbody></table></div>
             </div>
 
-            <!-- 7. Achievements (الإنجازات) -->
+            <!-- 7. Achievements -->
             <div id="achievements" class="section">
                 <h2 class="section-title"><i class="fas fa-medal"></i> الإنجازات والجوائز</h2>
-                <div class="form-grid">
-                    <input type="hidden" id="achievements-id">
-                    <div class="form-group full-width"><label>عنوان الإنجاز (مثال: المركز الأول في مسابقة الإلقاء):</label><input type="text" id="achievements-title"></div>
-                    <div class="form-group"><label>التاريخ:</label><input type="date" id="achievements-date"></div>
-                    <div class="form-group full-width"><label>وصف الإنجاز والجهة المانحة:</label><textarea id="achievements-desc" rows="2"></textarea></div>
-                    <div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('achievements')">توثيق الإنجاز</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-achievements" onclick="resetForm('achievements')">إلغاء</button></div>
-                </div>
-                <table class="dash-table" id="table-achievements"><thead><tr><th>الإنجاز</th><th>التاريخ</th><th>الوصف</th><th>الإجراءات</th></tr></thead><tbody></tbody></table>
+                <div class="form-grid"><input type="hidden" id="achievements-id"><div class="form-group full-width"><label>العنوان:</label><input type="text" id="achievements-title"></div><div class="form-group"><label>التاريخ:</label><input type="date" id="achievements-date"></div><div class="form-group full-width"><label>الوصف:</label><textarea id="achievements-desc" rows="2"></textarea></div><div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('achievements')">توثيق الإنجاز</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-achievements" onclick="resetForm('achievements')">إلغاء</button></div></div>
+                <div class="table-responsive"><table class="dash-table" id="table-achievements"><thead><tr><th>الإنجاز</th><th>التاريخ</th><th>الوصف</th><th>أوامر</th></tr></thead><tbody></tbody></table></div>
             </div>
 
             <!-- Sections: Enrichment, Events, Reports, Circulars -->
-            <div id="enrichment" class="section"><h2 class="section-title"><i class="fas fa-puzzle-piece"></i> توثيق البرامج الإثرائية</h2><div class="form-grid"><input type="hidden" id="enrichment-id"><div class="form-group"><label>اسم البرنامج:</label><input type="text" id="enrichment-name"></div><div class="form-group"><label>تاريخ التنفيذ:</label><input type="date" id="enrichment-date"></div><div class="form-group full-width"><label>المخرجات:</label><textarea id="enrichment-output" rows="2"></textarea></div><div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('enrichment')">حفظ البرنامج</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-enrichment" onclick="resetForm('enrichment')">إلغاء</button></div></div><table class="dash-table" id="table-enrichment"><thead><tr><th>البرنامج</th><th>التاريخ</th><th>المخرجات</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div>
-            <div id="events" class="section"><h2 class="section-title"><i class="fas fa-flag"></i> المناسبات والفعاليات</h2><div class="form-grid"><input type="hidden" id="events-id"><div class="form-group"><label>المناسبة:</label><input type="text" id="events-name"></div><div class="form-group"><label>التاريخ:</label><input type="date" id="events-date"></div><div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('events')">حفظ الفعالية</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-events" onclick="resetForm('events')">إلغاء</button></div></div><table class="dash-table" id="table-events"><thead><tr><th>المناسبة</th><th>التاريخ</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div>
-            <div id="reports" class="section"><h2 class="section-title"><i class="fas fa-file-signature"></i> أرشيف التقارير</h2><div class="form-grid"><input type="hidden" id="reports-id"><div class="form-group"><label>التاريخ:</label><input type="date" id="reports-date"></div><div class="form-group"><label>عنوان التقرير:</label><input type="text" id="reports-title"></div><div class="form-group full-width"><label>التفاصيل:</label><textarea id="reports-details" rows="3"></textarea></div><div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('reports')">حفظ التقرير</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-reports" onclick="resetForm('reports')">إلغاء</button></div></div><table class="dash-table" id="table-reports"><thead><tr><th>التاريخ</th><th>العنوان</th><th>التفاصيل</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div>
-            <div id="circulars" class="section"><h2 class="section-title"><i class="fas fa-envelope-open-text"></i> التعاميم الواردة</h2><div class="form-grid"><input type="hidden" id="circulars-id"><div class="form-group"><label>الرقم:</label><input type="text" id="circulars-number"></div><div class="form-group"><label>التاريخ:</label><input type="date" id="circulars-date"></div><div class="form-group full-width"><label>الموضوع:</label><input type="text" id="circulars-subject"></div><div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('circulars')">أرشفة</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-circulars" onclick="resetForm('circulars')">إلغاء</button></div></div><table class="dash-table" id="table-circulars"><thead><tr><th>الرقم</th><th>التاريخ</th><th>الموضوع</th><th>الإجراءات</th></tr></thead><tbody></tbody></table></div>
+            <div id="enrichment" class="section"><h2 class="section-title"><i class="fas fa-puzzle-piece"></i> البرامج الإثرائية</h2><div class="form-grid"><input type="hidden" id="enrichment-id"><div class="form-group"><label>البرنامج:</label><input type="text" id="enrichment-name"></div><div class="form-group"><label>التاريخ:</label><input type="date" id="enrichment-date"></div><div class="form-group full-width"><label>المخرجات:</label><textarea id="enrichment-output" rows="2"></textarea></div><div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('enrichment')">حفظ</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-enrichment" onclick="resetForm('enrichment')">إلغاء</button></div></div><div class="table-responsive"><table class="dash-table" id="table-enrichment"><thead><tr><th>البرنامج</th><th>التاريخ</th><th>المخرجات</th><th>أوامر</th></tr></thead><tbody></tbody></table></div></div>
+            <div id="events" class="section"><h2 class="section-title"><i class="fas fa-flag"></i> الفعاليات والمناسبات</h2><div class="form-grid"><input type="hidden" id="events-id"><div class="form-group"><label>المناسبة:</label><input type="text" id="events-name"></div><div class="form-group"><label>التاريخ:</label><input type="date" id="events-date"></div><div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('events')">حفظ</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-events" onclick="resetForm('events')">إلغاء</button></div></div><div class="table-responsive"><table class="dash-table" id="table-events"><thead><tr><th>المناسبة</th><th>التاريخ</th><th>أوامر</th></tr></thead><tbody></tbody></table></div></div>
+            <div id="reports" class="section"><h2 class="section-title"><i class="fas fa-file-signature"></i> التقارير</h2><div class="form-grid"><input type="hidden" id="reports-id"><div class="form-group"><label>التاريخ:</label><input type="date" id="reports-date"></div><div class="form-group"><label>العنوان:</label><input type="text" id="reports-title"></div><div class="form-group full-width"><label>التفاصيل:</label><textarea id="reports-details" rows="2"></textarea></div><div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('reports')">حفظ</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-reports" onclick="resetForm('reports')">إلغاء</button></div></div><div class="table-responsive"><table class="dash-table" id="table-reports"><thead><tr><th>التاريخ</th><th>العنوان</th><th>أوامر</th></tr></thead><tbody></tbody></table></div></div>
+            <div id="circulars" class="section"><h2 class="section-title"><i class="fas fa-envelope-open-text"></i> التعاميم</h2><div class="form-grid"><input type="hidden" id="circulars-id"><div class="form-group"><label>الرقم:</label><input type="text" id="circulars-number"></div><div class="form-group"><label>التاريخ:</label><input type="date" id="circulars-date"></div><div class="form-group full-width"><label>الموضوع:</label><input type="text" id="circulars-subject"></div><div class="form-group full-width action-buttons"><button class="btn btn-primary" onclick="saveDataRow('circulars')">أرشفة</button><button class="btn btn-outline" style="display:none;" id="btn-cancel-circulars" onclick="resetForm('circulars')">إلغاء</button></div></div><div class="table-responsive"><table class="dash-table" id="table-circulars"><thead><tr><th>الرقم</th><th>التاريخ</th><th>الموضوع</th><th>أوامر</th></tr></thead><tbody></tbody></table></div></div>
 
         </div>
     </div>
 
-    <!-- ================== واجهة العرض التفاعلي (الكتاب 3D) ================== -->
+    <!-- ================== واجهة العرض التفاعلي للكتاب (Flipbook) ================== -->
     <div id="flipbook-overlay">
-        <button class="btn-close-fb" onclick="closeFlipbook()"><i class="fas fa-times"></i> العودة للوحة التحكم</button>
-        <div class="hint-flip">انقر على زاوية الورقة للتقليب <i class="fas fa-hand-point-left"></i></div>
+        <button class="btn-close-fb" onclick="closeFlipbook()"><i class="fas fa-times"></i> إغلاق الكتاب</button>
         
-        <div class="book-wrapper" id="the-book">
-            <!-- الورقة 1: الغلاف والمقدمة -->
+        <!-- 4.A وضع الكمبيوتر (3D Flip) -->
+        <div class="desktop-book-wrapper">
+            <div class="hint-flip">انقر على زاوية الورقة للتقليب <i class="fas fa-hand-point-left"></i></div>
+            
+            <!-- الورقة 1 -->
             <div class="leaf" style="--i: 1" onclick="flipPage(this)">
                 <div class="face front cover-front">
-                    <div class="fb-content" style="align-items: center; justify-content: center; display: flex; flex-direction: column;">
-                        <i class="fas fa-lightbulb" style="color: var(--gold); font-size: clamp(3em, 5vw, 5em); margin-bottom: 20px;"></i>
+                    <div class="fb-content">
+                        <i class="fas fa-lightbulb" style="font-size: 4em; margin-bottom: 20px; color: var(--gold);"></i>
                         <h1 class="cover-title">سجل الموهوبين</h1>
-                        <h2 style="font-size: clamp(1.2em, 2vw, 2em); margin-bottom: 30px;">للعام الدراسي ١٤٤٧ هـ</h2>
+                        <h2 style="font-size: 1.5em; margin-bottom: 30px;">للعام الدراسي ١٤٤٧ هـ</h2>
                         <div style="border-top: 1px solid rgba(212, 175, 55, 0.5); padding-top: 20px; width: 80%;">
-                            <p id="fb-cover-school" style="font-size: 1.2em;"></p>
-                            <p id="fb-cover-coord" style="color: var(--gold); font-weight: bold; font-size: 1.1em;"></p>
+                            <p id="fb-cover-school-dt" style="font-size: 1.2em;"></p>
+                            <p id="fb-cover-coord-dt" style="color: var(--gold); font-weight: bold;"></p>
                         </div>
                     </div>
                 </div>
@@ -334,95 +371,177 @@
                     <div class="fb-content">
                         <h3 class="fb-page-title"><i class="fas fa-id-card"></i> بطاقة المدرسة</h3>
                         <table class="fb-table">
-                            <tr><th>المدرسة</th><td id="fb-intro-school"></td></tr>
-                            <tr><th>الرقم الوزاري</th><td id="fb-intro-id"></td></tr>
-                            <tr><th>المدير</th><td id="fb-intro-prin"></td></tr>
-                            <tr><th>المنسق</th><td id="fb-intro-coord"></td></tr>
+                            <tr><th>المدرسة</th><td id="fb-intro-school-dt"></td></tr>
+                            <tr><th>الرقم الوزاري</th><td id="fb-intro-id-dt"></td></tr>
+                            <tr><th>المدير</th><td id="fb-intro-prin-dt"></td></tr>
+                            <tr><th>المنسق</th><td id="fb-intro-coord-dt"></td></tr>
                         </table>
-                        <h3 class="fb-page-title" style="margin-top: 30px;"><i class="fas fa-seedling"></i> أهداف ورعاية الموهوبين</h3>
-                        <p id="fb-intro-desc" style="line-height:1.8; font-size: 0.9em;"></p>
+                        <h3 class="fb-page-title" style="margin-top: 20px;"><i class="fas fa-seedling"></i> أهداف ورعاية الموهوبين</h3>
+                        <p id="fb-intro-desc-dt" style="line-height:1.8; font-size: 0.9em;"></p>
                         <div class="page-number">١</div>
                     </div>
                 </div>
             </div>
 
-            <!-- الورقة 2: الخطة والطلاب -->
+            <!-- الورقة 2 -->
             <div class="leaf" style="--i: 2" onclick="flipPage(this)">
                 <div class="face front">
                     <div class="fb-content">
                         <h3 class="fb-page-title"><i class="fas fa-tasks"></i> الخطة الإجرائية</h3>
-                        <table class="fb-table">
-                            <thead><tr><th>البرنامج</th><th>المستهدفون</th><th>الحالة</th></tr></thead>
-                            <tbody id="fb-plan-body"></tbody>
-                        </table>
+                        <div class="fb-table-wrap">
+                            <table class="fb-table">
+                                <thead><tr><th>البرنامج</th><th>الحالة</th></tr></thead>
+                                <tbody id="fb-plan-body-dt"></tbody>
+                            </table>
+                        </div>
                         <div class="page-number">٢</div>
                     </div>
                 </div>
                 <div class="face back">
                     <div class="fb-content">
                         <h3 class="fb-page-title"><i class="fas fa-user-graduate"></i> الطلاب الموهوبين</h3>
-                        <table class="fb-table">
-                            <thead><tr><th>اسم الطالب</th><th>الصف</th><th>الموهبة</th></tr></thead>
-                            <tbody id="fb-students-body"></tbody>
-                        </table>
+                        <div class="fb-table-wrap">
+                            <table class="fb-table">
+                                <thead><tr><th>اسم الطالب</th><th>الصف</th><th>الموهبة</th></tr></thead>
+                                <tbody id="fb-students-body-dt"></tbody>
+                            </table>
+                        </div>
                         <div class="page-number">٣</div>
                     </div>
                 </div>
             </div>
 
-            <!-- الورقة 3: المسابقات والدورات -->
+            <!-- الورقة 3 -->
             <div class="leaf" style="--i: 3" onclick="flipPage(this)">
                 <div class="face front">
                     <div class="fb-content">
                         <h3 class="fb-page-title"><i class="fas fa-trophy"></i> المسابقات المنفذة</h3>
-                        <table class="fb-table">
-                            <thead><tr><th>المسابقة</th><th>الطالب</th><th>المجال</th></tr></thead>
-                            <tbody id="fb-competitions-body"></tbody>
-                        </table>
+                        <div class="fb-table-wrap">
+                            <table class="fb-table">
+                                <thead><tr><th>المسابقة</th><th>الطالب</th><th>المجال</th></tr></thead>
+                                <tbody id="fb-competitions-body-dt"></tbody>
+                            </table>
+                        </div>
                         <div class="page-number">٤</div>
                     </div>
                 </div>
                 <div class="face back">
                     <div class="fb-content">
                         <h3 class="fb-page-title"><i class="fas fa-chalkboard-teacher"></i> الأنشطة والدورات</h3>
-                        <table class="fb-table">
-                            <thead><tr><th>النشاط/الدورة</th><th>التاريخ</th></tr></thead>
-                            <tbody id="fb-training-body"></tbody>
-                        </table>
+                        <div class="fb-table-wrap"><table class="fb-table"><thead><tr><th>النشاط</th><th>التاريخ</th></tr></thead><tbody id="fb-training-body-dt"></tbody></table></div>
                         <h3 class="fb-page-title" style="margin-top:20px;"><i class="fas fa-puzzle-piece"></i> البرامج الإثرائية</h3>
-                        <table class="fb-table">
-                            <thead><tr><th>البرنامج</th><th>تاريخه</th></tr></thead>
-                            <tbody id="fb-enrichment-body"></tbody>
-                        </table>
+                        <div class="fb-table-wrap"><table class="fb-table"><thead><tr><th>البرنامج</th><th>تاريخه</th></tr></thead><tbody id="fb-enrichment-body-dt"></tbody></table></div>
                         <div class="page-number">٥</div>
                     </div>
                 </div>
             </div>
 
-            <!-- الورقة 4: الإنجازات والغلاف الخلفي -->
+            <!-- الورقة 4 -->
             <div class="leaf" style="--i: 4" onclick="flipPage(this)">
                 <div class="face front">
                     <div class="fb-content">
                         <h3 class="fb-page-title"><i class="fas fa-medal"></i> الإنجازات والجوائز</h3>
-                        <table class="fb-table">
-                            <thead><tr><th>الإنجاز</th><th>الوصف</th></tr></thead>
-                            <tbody id="fb-achievements-body"></tbody>
-                        </table>
+                        <div class="fb-table-wrap">
+                            <table class="fb-table">
+                                <thead><tr><th>الإنجاز</th><th>الوصف</th></tr></thead>
+                                <tbody id="fb-achievements-body-dt"></tbody>
+                            </table>
+                        </div>
                         <div class="page-number">٦</div>
                     </div>
                 </div>
-                <div class="face back cover-front" style="background: var(--primary-color); outline: none; border: none;">
-                    <div class="fb-content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden;">
-                        <i class="fas fa-star" style="color: var(--gold); font-size: clamp(3em, 5vw, 4em);"></i>
-                        <p style="color: white; font-family: 'Amiri', serif; font-size: clamp(1.5em, 2.5vw, 2em); margin-top: 30px;">مدارس تصنع المستقبل</p>
-                        <p id="fb-back-school" style="color: rgba(255,255,255,0.5); margin-top: 50px; font-size: clamp(0.8em, 1vw, 1em);"></p>
+                <div class="face back cover-front">
+                    <div class="fb-content">
+                        <i class="fas fa-star" style="color: var(--gold); font-size: 3em;"></i>
+                        <p style="color: white; font-family: 'Amiri', serif; font-size: 1.5em; margin-top: 20px;">مدارس تصنع المستقبل</p>
+                        <p id="fb-back-school-dt" style="color: rgba(255,255,255,0.5); margin-top: 30px; font-size: 0.9em;"></p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- 4.B وضع الجوال (Vertical Swipe Cards) -->
+        <div class="mobile-book-container">
+            <!-- غلاف الجوال -->
+            <div class="mobile-page cover-front" style="min-height: 50vh;">
+                <div class="fb-content" style="align-items: center; text-align: center;">
+                    <i class="fas fa-lightbulb" style="font-size: 3em; margin-bottom: 10px; color: var(--gold);"></i>
+                    <h1 class="cover-title" style="font-size: 2em;">سجل الموهوبين</h1>
+                    <p id="fb-cover-school-mb" style="font-size: 1em; margin-top: 10px;"></p>
+                </div>
+            </div>
+            
+            <!-- صفحة 1 الجوال -->
+            <div class="mobile-page">
+                <div class="fb-content">
+                    <h3 class="fb-page-title"><i class="fas fa-id-card"></i> بطاقة المدرسة</h3>
+                    <div class="fb-table-wrap">
+                        <table class="fb-table">
+                            <tr><th>المدرسة</th><td id="fb-intro-school-mb"></td></tr>
+                            <tr><th>المدير</th><td id="fb-intro-prin-mb"></td></tr>
+                            <tr><th>المنسق</th><td id="fb-intro-coord-mb"></td></tr>
+                        </table>
+                    </div>
+                    <h3 class="fb-page-title" style="margin-top: 15px;"><i class="fas fa-seedling"></i> أهداف ورعاية الموهوبين</h3>
+                    <p id="fb-intro-desc-mb" style="line-height:1.6; font-size: 0.85em;"></p>
+                </div>
+                <div class="page-number">١</div>
+            </div>
+
+            <!-- صفحة 2 الجوال -->
+            <div class="mobile-page">
+                <div class="fb-content">
+                    <h3 class="fb-page-title"><i class="fas fa-tasks"></i> الخطة الإجرائية</h3>
+                    <div class="fb-table-wrap">
+                        <table class="fb-table">
+                            <thead><tr><th>البرنامج</th><th>الحالة</th></tr></thead>
+                            <tbody id="fb-plan-body-mb"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="page-number">٢</div>
+            </div>
+
+            <!-- صفحة 3 الجوال -->
+            <div class="mobile-page">
+                <div class="fb-content">
+                    <h3 class="fb-page-title"><i class="fas fa-user-graduate"></i> الطلاب الموهوبين</h3>
+                    <div class="fb-table-wrap">
+                        <table class="fb-table">
+                            <thead><tr><th>اسم الطالب</th><th>الصف</th></tr></thead>
+                            <tbody id="fb-students-body-mb"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="page-number">٣</div>
+            </div>
+            
+            <!-- صفحة 4 الجوال -->
+            <div class="mobile-page">
+                <div class="fb-content">
+                    <h3 class="fb-page-title"><i class="fas fa-trophy"></i> المسابقات</h3>
+                    <div class="fb-table-wrap">
+                        <table class="fb-table">
+                            <thead><tr><th>المسابقة</th><th>الطالب</th></tr></thead>
+                            <tbody id="fb-competitions-body-mb"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="page-number">٤</div>
+            </div>
+
+            <!-- نهاية الجوال -->
+            <div class="mobile-page cover-front" style="min-height: 30vh; background: var(--primary-color);">
+                <div class="fb-content" style="align-items: center; justify-content: center;">
+                    <i class="fas fa-star" style="color: var(--gold); font-size: 2em;"></i>
+                    <p style="color: white; font-family: 'Amiri', serif; font-size: 1.2em; margin-top: 10px;">مدارس تصنع المستقبل</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- ================== سكربت البرمجة (JS) السحابي ================== -->
+    <!-- ================== سكربت البرمجة (JS) ================== -->
     <script>
         // إعدادات Firebase
         const firebaseConfig = { 
@@ -433,26 +552,14 @@
         };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
-        const dbRef = database.ref('gifted_coordinator_data_v1'); // مسار مستقل خاص بمنسق الموهوبين
+        const dbRef = database.ref('gifted_coordinator_data_v1');
 
-        // البيانات الافتراضية محملة مسبقاً بناءً على طلبك
         const defaultData = {
             schoolInfo: { name: 'أسيد بن حضير', minNumber: '47301', office: 'القصيم', stage: 'الابتدائية', principal: 'سعود بن سعد العفري', coordinator: 'عاصم محمد عبد العزيز المشيقح' },
             ksaCare: { desc: 'تيسير وتسهيل الإجراءات في مجال رعاية الموهوبين ونشر الثقافة داخل المدرسة...', roles: ['اكتشاف الموهوبين', 'الترشيح للمسابقات'] },
             plan: [
-                { id: 1, program: 'إعداد الملفات التنظيمية', actions: 'استلام سجل منسق/ة الموهوبين وتدوين البيانات الأولية\nالتعرف على الخطة الإجرائية لمنسق/ة الموهوبين وتدوين خطة التنفيذ', targets: 'جميع المدارس', status: 'لم ينفذ' },
-                { id: 2, program: 'نشر ثقافة الموهبة', actions: 'توعية المجتمع المدرسي والمحلي ببرامج الموهوبين (مطويات – لقاءات – الإذاعة المدرسية- منصة مدرستي – المنصات التعليمية المختلفة)\nتقرير التفعيل في المدرسة', targets: 'جميع المدارس', status: 'لم ينفذ' },
-                { id: 3, program: 'البرنامج الوطني للكشف عن الموهوبين', actions: 'التوعية والتعريف بالبرنامج الوطني للكشف عن الموهوبين\nترشيح الطلبة الموهوبين وفق استمارة خصائص السمات السلوكية\nمتابعة تسجيل الطلبة وقائمة بالمسجلين\nتدريب الطلبة على نماذج البرنامج ومتابعة الحضور\nقائمة بالطلبة المجتازين لمقياس موهبة وتقرير التفعيل', targets: 'الطلبة من الصف الثالث الابتدائي إلى الأول الثانوي', status: 'لم ينفذ' },
-                { id: 4, program: 'الأولمبياد الوطني للإبداع العلمي – إبداع 2026', actions: 'التوعية والتعريف بمسابقة الأولمبياد الوطني للإبداع العلمي\nتحقيق نسبة تسجيل (25% أو أكثر) وقائمة بالطلبة\nمتابعة رفع (5) مشاريع على الأقل\nتدريب الطلبة على مهارات البحث العلمي وإعداد تقرير التفعيل', targets: 'طلبة المرحلة المتوسطة والثانوية', status: 'لم ينفذ' },
-                { id: 5, program: 'الأولمبياد الوطني للإبداع للبرمجة والذكاء الاصطناعي', actions: 'التوعية والتعريف بالمسابقة وقائمة المسجلين\nتحقيق نسبة تسجيل 25%\nتدريب الطلبة ومتابعة الحضور للمرحلة الثانية\nإعداد تقرير التفعيل', targets: 'طلبة المرحلة المتوسطة والثانوية', status: 'لم ينفذ' },
-                { id: 6, program: 'مسابقة الباحث الصغير', actions: 'الاطلاع على التعميم وتدريب الطلبة\nإعداد قائمة بالمشاركين والإشراف على البحوث\nالمشاركة في المعرض النهائي وتقرير التفعيل', targets: 'طلبة المرحلة الابتدائية', status: 'لم ينفذ' },
-                { id: 7, program: 'اليوم الوطني السعودي', actions: 'المشاركة في تفعيل المناسبة بالتعاون مع منسوبي المدرسة\nإعداد تقرير المشاركة', targets: 'جميع المدارس', status: 'لم ينفذ' },
-                { id: 8, program: 'يوم التأسيس', actions: 'المشاركة في تفعيل المناسبة\nإعداد تقرير التفعيل', targets: 'جميع المدارس', status: 'لم ينفذ' },
-                { id: 9, program: 'اليوم الخليجي والأسبوع الوطني للموهبة والإبداع', actions: 'إعداد وتنفيذ خطة التفعيل وتفعيل الشراكات المجتمعية\nإعداد تقرير التفعيل', targets: 'جميع المدارس', status: 'لم ينفذ' },
-                { id: 10, program: 'اليوم العالمي للإبداع والابتكار', actions: 'إعداد وتنفيذ خطة التفعيل\nإعداد تقرير التفعيل', targets: 'جميع المدارس', status: 'لم ينفذ' },
-                { id: 11, program: 'اليوم العالمي للملكية الفكرية', actions: 'إعداد وتنفيذ خطة التفعيل\nإعداد تقرير التفعيل', targets: 'جميع المدارس', status: 'لم ينفذ' },
-                { id: 12, program: 'البرامج الإثرائية', actions: 'اختيار البرنامج الإثرائي (مساحة ابتكار، البحث العلمي، STEM، المبدعون الصغار)\nتعبئة نموذج المشاركة وحضور البرامج التدريبية\nاختيار الفئة المستهدفة وتنفيذ الخطة الزمنية\nإعداد معرض لمنتجات الطلاب\nإعداد التقرير', targets: 'كل برنامج مخصص لمرحلة', status: 'لم ينفذ' },
-                { id: 13, program: 'البرنامج الإرشادي', actions: 'تحديد واختيار الفئة المستهدفة\nتقديم حقيبة البرنامج الإرشادي\nإعداد التقرير', targets: 'ابتدائي – متوسط - ثانوي', status: 'لم ينفذ' }
+                { id: 1, program: 'إعداد الملفات التنظيمية', actions: 'استلام سجل منسق/ة الموهوبين\nالتعرف على الخطة الإجرائية', targets: 'جميع المدارس', status: 'لم ينفذ' },
+                { id: 2, program: 'البرنامج الوطني للكشف عن الموهوبين', actions: 'التوعية بالبرنامج\nترشيح الطلبة الموهوبين', targets: '3 ابتدائي إلى 1 ثانوي', status: 'لم ينفذ' }
             ], 
             students: [], competitions: [], training: [], achievements: [], enrichment: [], events: [], reports: [], circulars: []
         };
@@ -460,15 +567,13 @@
         const STORAGE_KEY = 'gifted_super_data';
         let appData = defaultData;
 
-        // تهيئة التطبيق والربط السحابي
+        // تهيئة التطبيق
         function initApp() {
             dbRef.on('value', snap => {
                 if(snap.exists()) {
                     appData = snap.val();
-                    // ضمان وجود جميع الهياكل
                     ['students', 'competitions', 'training', 'achievements', 'enrichment', 'events', 'reports', 'circulars', 'plan'].forEach(key => { if(!appData[key]) appData[key] = []; });
                 } else {
-                    // الرفع الأول لقاعدة البيانات بالخطة الافتراضية المجهزة
                     appData = defaultData;
                     dbRef.set(appData);
                 }
@@ -479,21 +584,30 @@
         // الحفظ السحابي
         function saveData() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-            dbRef.set(appData).catch(err => console.error("Error saving to Firebase: ", err));
+            dbRef.set(appData).catch(err => console.error("Error: ", err));
             updateUI(); 
         }
 
         function genId() { return Date.now() + Math.floor(Math.random() * 100); }
 
-        // 1. التنقل بين أقسام لوحة التحكم
+        // إدارة القائمة الجانبية في الجوال
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('mobile-overlay').classList.toggle('active');
+        }
+
+        // التنقل بين الأقسام
         function showSection(sectionId) {
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.nav-links li').forEach(link => link.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            if(event) event.currentTarget.classList.add('active');
+            
+            // إغلاق القائمة في الجوال بعد الاختيار
+            if(window.innerWidth <= 992) { toggleSidebar(); }
         }
 
-        // 3. تحديث واجهة لوحة التحكم
+        // تحديث واجهة لوحة التحكم
         function updateUI() {
             document.getElementById('stat-students').innerText = appData.students.length;
             document.getElementById('stat-competitions').innerText = appData.competitions.length;
@@ -522,6 +636,7 @@
             renderTable('circulars', ['number', 'date', 'subject']);
         }
 
+        // دوال التعديل للبيانات الأولية
         function toggleIntroEdit() {
             const form = document.getElementById('intro-edit-form'), display = document.getElementById('intro-display-table'), btn = document.getElementById('btn-toggle-intro');
             if(form.style.display === 'none') {
@@ -531,7 +646,6 @@
                 document.getElementById('edit-principal').value = appData.schoolInfo.principal; document.getElementById('edit-coordinator').value = appData.schoolInfo.coordinator;
             } else { form.style.display = 'none'; display.style.display = 'table'; btn.style.display = 'inline-flex'; }
         }
-        
         function saveIntro() {
             appData.schoolInfo = { name: document.getElementById('edit-school-name').value, minNumber: document.getElementById('edit-school-id').value, office: document.getElementById('edit-office').value, stage: document.getElementById('edit-stage').value, principal: document.getElementById('edit-principal').value, coordinator: document.getElementById('edit-coordinator').value };
             saveData(); toggleIntroEdit();
@@ -544,23 +658,16 @@
                 document.getElementById('edit-ksacare-desc').value = appData.ksaCare.desc; document.getElementById('edit-ksacare-roles').value = appData.ksaCare.roles.join('\n');
             } else { form.style.display = 'none'; display.style.display = 'block'; btn.style.display = 'inline-flex'; }
         }
-        
         function saveKsaCare() {
             appData.ksaCare.desc = document.getElementById('edit-ksacare-desc').value; appData.ksaCare.roles = document.getElementById('edit-ksacare-roles').value.split('\n').filter(r => r.trim() !== '');
             saveData(); toggleKsaCareEdit();
         }
 
-        // نظام الحقول والجداول المحدث
+        // نظام الجداول
         const fieldsMap = {
-            plan: ['program', 'actions', 'targets', 'status'], 
-            students: ['name', 'grade', 'talent'], 
-            competitions: ['compName', 'studentName', 'grade', 'field'],
-            training: ['name', 'target', 'date'], 
-            achievements: ['title', 'date', 'desc'], 
-            enrichment: ['name', 'date', 'output'], 
-            events: ['name', 'date'],
-            reports: ['date', 'title', 'details'], 
-            circulars: ['number', 'date', 'subject']
+            plan: ['program', 'actions', 'targets', 'status'], students: ['name', 'grade', 'talent'], competitions: ['compName', 'studentName', 'grade', 'field'],
+            training: ['name', 'target', 'date'], achievements: ['title', 'date', 'desc'], enrichment: ['name', 'date', 'output'], events: ['name', 'date'],
+            reports: ['date', 'title', 'details'], circulars: ['number', 'date', 'subject']
         };
 
         function renderTable(key, cols) {
@@ -572,14 +679,13 @@
                 cols.forEach(col => {
                     let val = item[col] || '-';
                     if(col === 'status') {
-                        val = `<span style="color:${val==='منفذ'?'#059669':(val==='لم ينفذ'?'#dc2626':'#d97706')}; font-weight:bold; background:#f4f7f6; padding:4px 8px; border-radius:4px; font-size:0.85em;">${val}</span>`;
+                        val = `<span style="color:${val==='منفذ'?'#059669':(val==='لم ينفذ'?'#dc2626':'#d97706')}; font-weight:bold; background:#f4f7f6; padding:4px 8px; border-radius:4px; font-size:0.85em; white-space:nowrap;">${val}</span>`;
                     } else if(col === 'actions') {
-                        // تنسيق الإجراءات كقائمة نقطية مرتبة
-                        val = `<ul style="margin:0; padding-right:20px; text-align:right; font-size:0.85em; list-style-type:circle;">` + val.split('\n').filter(v=>v.trim()).map(v=>`<li style="margin-bottom:4px;">${v.trim()}</li>`).join('') + `</ul>`;
+                        val = `<ul style="margin:0; padding-right:15px; font-size:0.85em;">` + val.split('\n').filter(v=>v.trim()).map(v=>`<li style="margin-bottom:2px;">${v.trim()}</li>`).join('') + `</ul>`;
                     }
                     row += `<td>${val}</td>`;
                 });
-                row += `<td class="action-buttons"><button class="btn btn-outline btn-sm" onclick="editDataRow('${key}', ${item.id})" title="تعديل"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteDataRow('${key}', ${item.id})" title="حذف"><i class="fas fa-trash"></i></button></td></tr>`;
+                row += `<td class="action-buttons"><button class="btn btn-outline btn-sm" onclick="editDataRow('${key}', ${item.id})"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteDataRow('${key}', ${item.id})"><i class="fas fa-trash"></i></button></td></tr>`;
                 tbody.innerHTML += row;
             });
         }
@@ -588,11 +694,8 @@
             const id = document.getElementById(`${key}-id`).value;
             let item = { id: id ? parseInt(id) : genId() };
             fieldsMap[key].forEach(f => item[f] = document.getElementById(`${key}-${f}`).value.trim());
-            
             if(!item[fieldsMap[key][0]]) { alert('يرجى تعبئة الحقول الأساسية'); return; }
-            
-            if(id) { const idx = appData[key].findIndex(p => p.id == id); appData[key][idx] = item; } 
-            else { appData[key].push(item); }
+            if(id) { const idx = appData[key].findIndex(p => p.id == id); appData[key][idx] = item; } else { appData[key].push(item); }
             saveData(); resetForm(key);
         }
 
@@ -618,16 +721,14 @@
         }
 
         // =======================================================
-        // 4. برمجة العرض التفاعلي (الكتاب) Flipbook Logic
+        // 4. برمجة العرض التفاعلي (الكتاب)
         // =======================================================
         let currentLeaf = 1;
-        const totalLeaves = 4;
 
         function openFlipbook() {
             document.getElementById('main-app').style.display = 'none';
             document.getElementById('flipbook-overlay').style.display = 'flex';
             populateFlipbook();
-            
             document.querySelectorAll('.leaf').forEach(l => l.classList.remove('flipped'));
             currentLeaf = 1;
         }
@@ -638,6 +739,7 @@
         }
 
         function flipPage(leafElement) {
+            if(window.innerWidth <= 992) return; // لا تعمل حركة 3D على الجوال
             const leafIndex = parseInt(leafElement.style.getPropertyValue('--i'));
             if (!leafElement.classList.contains('flipped')) {
                 if (leafIndex === currentLeaf) { leafElement.classList.add('flipped'); currentLeaf++; }
@@ -647,28 +749,40 @@
         }
 
         function populateFlipbook() {
-            document.getElementById('fb-cover-school').innerText = appData.schoolInfo.name;
-            document.getElementById('fb-cover-coord').innerText = "إعداد: " + appData.schoolInfo.coordinator;
-            document.getElementById('fb-back-school').innerText = appData.schoolInfo.name + ' - ١٤٤٧ هـ';
-            
-            document.getElementById('fb-intro-school').innerText = appData.schoolInfo.name;
-            document.getElementById('fb-intro-id').innerText = appData.schoolInfo.minNumber;
-            document.getElementById('fb-intro-prin').innerText = appData.schoolInfo.principal;
-            document.getElementById('fb-intro-coord').innerText = appData.schoolInfo.coordinator;
-            document.getElementById('fb-intro-desc').innerText = appData.ksaCare.desc;
+            // تعبئة للكمبيوتر
+            document.getElementById('fb-cover-school-dt').innerText = appData.schoolInfo.name;
+            document.getElementById('fb-cover-coord-dt').innerText = "إعداد: " + appData.schoolInfo.coordinator;
+            document.getElementById('fb-back-school-dt').innerText = appData.schoolInfo.name + ' - ١٤٤٧ هـ';
+            document.getElementById('fb-intro-school-dt').innerText = appData.schoolInfo.name;
+            document.getElementById('fb-intro-id-dt').innerText = appData.schoolInfo.minNumber;
+            document.getElementById('fb-intro-prin-dt').innerText = appData.schoolInfo.principal;
+            document.getElementById('fb-intro-coord-dt').innerText = appData.schoolInfo.coordinator;
+            document.getElementById('fb-intro-desc-dt').innerText = appData.ksaCare.desc;
 
-            const mapRows = (arr, cols) => arr.slice(0,10).map(item => `<tr>${cols.map(c => `<td>${item[c]||'-'}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${cols.length}" style="text-align:center">لا يوجد بيانات</td></tr>`;
+            // تعبئة للجوال
+            document.getElementById('fb-cover-school-mb').innerText = appData.schoolInfo.name;
+            document.getElementById('fb-intro-school-mb').innerText = appData.schoolInfo.name;
+            document.getElementById('fb-intro-prin-mb').innerText = appData.schoolInfo.principal;
+            document.getElementById('fb-intro-coord-mb').innerText = appData.schoolInfo.coordinator;
+            document.getElementById('fb-intro-desc-mb').innerText = appData.ksaCare.desc;
+
+            const mapRowsDt = (arr, cols) => arr.slice(0,10).map(item => `<tr>${cols.map(c => `<td>${item[c]||'-'}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${cols.length}" style="text-align:center">لا يوجد بيانات</td></tr>`;
+            const mapRowsMb = (arr, cols) => arr.slice(0,10).map(item => `<tr>${cols.map(c => `<td style="font-size:0.8em; padding:5px;">${item[c]||'-'}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${cols.length}" style="text-align:center">لا يوجد بيانات</td></tr>`;
             
-            // في الكتاب يتم عرض اسم البرنامج والمستهدفون والحالة فقط لضيق المساحة وتجنب كثرة الأسطر للإجراءات
-            document.getElementById('fb-plan-body').innerHTML = mapRows(appData.plan, ['program', 'targets', 'status']);
-            document.getElementById('fb-students-body').innerHTML = mapRows(appData.students, ['name', 'grade', 'talent']);
-            document.getElementById('fb-competitions-body').innerHTML = mapRows(appData.competitions, ['compName', 'studentName', 'field']);
-            document.getElementById('fb-training-body').innerHTML = mapRows(appData.training, ['name', 'date']);
-            document.getElementById('fb-enrichment-body').innerHTML = mapRows(appData.enrichment, ['name', 'date']);
-            document.getElementById('fb-achievements-body').innerHTML = mapRows(appData.achievements, ['title', 'desc']);
+            // جداول الكمبيوتر
+            document.getElementById('fb-plan-body-dt').innerHTML = mapRowsDt(appData.plan, ['program', 'status']);
+            document.getElementById('fb-students-body-dt').innerHTML = mapRowsDt(appData.students, ['name', 'grade', 'talent']);
+            document.getElementById('fb-competitions-body-dt').innerHTML = mapRowsDt(appData.competitions, ['compName', 'studentName', 'field']);
+            document.getElementById('fb-training-body-dt').innerHTML = mapRowsDt(appData.training, ['name', 'date']);
+            document.getElementById('fb-enrichment-body-dt').innerHTML = mapRowsDt(appData.enrichment, ['name', 'date']);
+            document.getElementById('fb-achievements-body-dt').innerHTML = mapRowsDt(appData.achievements, ['title', 'desc']);
+
+            // جداول الجوال (أصغر وأقل أعمدة)
+            document.getElementById('fb-plan-body-mb').innerHTML = mapRowsMb(appData.plan, ['program', 'status']);
+            document.getElementById('fb-students-body-mb').innerHTML = mapRowsMb(appData.students, ['name', 'grade']);
+            document.getElementById('fb-competitions-body-mb').innerHTML = mapRowsMb(appData.competitions, ['compName', 'studentName']);
         }
 
-        // تشغيل التحديث والربط السحابي فور فتح الصفحة
         window.onload = () => { initApp(); };
     </script>
 </body>
